@@ -1,0 +1,654 @@
+== Run at 2026-10-09T13:08:06Z ==
+
+$ docker build -t legacy-web:1.0.0 .
+#0 building with "orbstack" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 794B done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/dunglas/frankenphp:1-php8.3-alpine
+#2 DONE 0.3s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 60B done
+#3 DONE 0.0s
+
+#4 [1/6] FROM docker.io/dunglas/frankenphp:1-php8.3-alpine@sha256:db71e31f5340b0bda97220bd3d67cc47bcd7352bf3430f07eda8c1531b526781
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 158B done
+#5 DONE 0.0s
+
+#6 [3/6] COPY docker/zz-prod.ini /usr/local/etc/php/conf.d/zz-prod.ini
+#6 CACHED
+
+#7 [2/6] COPY docker/Caddyfile /etc/caddy/Caddyfile
+#7 CACHED
+
+#8 [4/6] COPY app/ /app/public/
+#8 CACHED
+
+#9 [5/6] RUN apk add --no-cache libcap  && setcap -r /usr/local/bin/frankenphp || true  && apk del libcap  && adduser -D -u 10001 app  && mkdir -p /data/caddy /config/caddy  && chown -R app:app /data /config
+#9 CACHED
+
+#10 [6/6] WORKDIR /app
+#10 CACHED
+
+#11 exporting to image
+#11 exporting layers done
+#11 writing image sha256:73a607d860eb5bd18e1e654b199e8fe29677b63049e26858ac27f9396ea70e9c done
+#11 naming to docker.io/library/legacy-web:1.0.0 done
+#11 DONE 0.0s
+[exit=0]
+
+$ docker run -d --name lw -p 8080:8080 legacy-web:1.0.0
+b13d5e2baf61453bc681c8ce8d8aa10b887baefc01b2ed8645c93b89b0551fe1
+[exit=0]
+
+$ curl -si localhost:8080/healthz
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:08:11 GMT
+Content-Length: 43
+
+{"status":"healthy","timestamp":1791551291}[exit=0]
+
+$ curl -si localhost:8080/readyz
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:08:11 GMT
+Content-Length: 88
+
+{"status":"ready","db_host":"localhost","cache_host":"localhost","timestamp":1791551291}[exit=0]
+
+$ curl -si localhost:8080/
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:08:11 GMT
+Content-Length: 255
+
+{
+    "service": "Legacy-Web-Service",
+    "environment": "production",
+    "message": "Service operational on Kubernetes",
+    "version": "1.0.0",
+    "hostname": "b13d5e2baf61",
+    "client_ip": "192.168.215.1",
+    "time": "2026-10-09T13:08:11+00:00"
+}[exit=0]
+
+$ docker exec lw id
+uid=10001(app) gid=10001(app) groups=10001(app)
+[exit=0]
+
+$ docker logs lw
+2026/10/09 13:08:07.423	[34mINFO[0m	maxprocs: Leaving GOMAXPROCS=12: CPU quota undefined
+2026/10/09 13:08:07.423	[34mINFO[0m	GOMEMLIMIT is updated	{"GOMEMLIMIT": 11339860377, "previous": 9223372036854775807}
+2026/10/09 13:08:07.423	[34mINFO[0m	using config from file	{"file": "/etc/caddy/Caddyfile"}
+2026/10/09 13:08:07.423	[34mINFO[0m	adapted config to JSON	{"adapter": "caddyfile"}
+2026/10/09 13:08:07.423	[33mWARN[0m	admin	admin endpoint disabled
+2026/10/09 13:08:07.423	[34mINFO[0m	http.auto_https	automatic HTTPS is completely disabled for server	{"server_name": "srv0"}
+2026/10/09 13:08:07.423	[34mINFO[0m	tls.cache.maintenance	started background certificate maintenance	{"cache": "0x940974e4b80"}
+2026/10/09 13:08:07.433	[34mINFO[0m	frankenphp	FrankenPHP started 🐘	{"php_version": "8.3.35", "total_threads": 24, "worker_threads": 0, "max_threads": 24, "max_requests": 0}
+2026/10/09 13:08:07.435	[33mWARN[0m	http	HTTP/2 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
+2026/10/09 13:08:07.435	[33mWARN[0m	http	HTTP/3 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
+2026/10/09 13:08:07.435	[34mINFO[0m	http.log	server running	{"name": "srv0", "protocols": ["h1", "h2", "h3"]}
+2026/10/09 13:08:07.435	[34mINFO[0m	autosaved config (load with --resume flag)	{"file": "/config/caddy/autosave.json"}
+2026/10/09 13:08:07.435	[34mINFO[0m	serving initial configuration
+2026/10/09 13:08:07.436	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
+2026/10/09 13:08:07.437	[34mINFO[0m	tls	finished cleaning storage units
+{"level":"info","ts":1791551291.4489372,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56242","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/healthz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.00138987,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551291.463642,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56250","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/readyz","headers":{"Accept":["*/*"],"User-Agent":["curl/8.7.1"]}},"bytes_read":0,"user_id":"","duration":0.000302249,"size":88,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551291.4764268,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56256","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000289791,"size":255,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+[exit=0]
+
+$ docker rm -f lw
+lw
+[exit=0]
+
+== PHP error handling: warnings must reach stderr, not the HTTP response ==
+
+$ docker run -d --name lw-err -p 8090:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.68UCV9lbdP/err.php:/app/public/err.php:ro legacy-web:1.0.0
+5c9b0f13da57c44ee95cd4fc4528970ff08714c68c83360a8ffafa8fb6ff3949
+[exit=0]
+$ curl -s localhost:8090/err.php   (expect body: ok)
+ok
+$ docker logs (stderr only), PHP warnings:
+2026/10/09 13:08:15.819	[33mWARN[0m	http.handlers.php	PHP Warning:  Undefined variable $undefined in /app/public/err.php on line 2	{"syslog_level": "warning"}
+2026/10/09 13:08:15.819	[33mWARN[0m	http.handlers.php	PHP Warning:  custom-test-error in /app/public/err.php on line 3	{"syslog_level": "warning"}
+$ X-Powered-By header (expect none):
+(none)
+
+$ docker rm -f lw-err
+lw-err
+[exit=0]
+
+== Caddy metrics (opt-in; not enabled in the shipped Caddyfile) ==
+
+$ docker run -d --name lw-met -p 8091:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.68UCV9lbdP/Caddyfile:/etc/caddy/Caddyfile:ro legacy-web:1.0.0
+59a68178bf73dfad0e9835efb6e5fd9afc2d1e128da16b2819f65bd8e23865a7
+[exit=0]
+$ curl -s localhost:8091/metrics | grep caddy_http_requests_total
+caddy_http_requests_total{handler="php",server="srv0"} 2
+caddy_http_requests_total{handler="rewrite",server="srv0"} 2
+caddy_http_requests_total{handler="vars",server="srv0"} 2
+
+$ docker rm -f lw-met
+lw-met
+[exit=0]
+
+$ helm lint helm/legacy-web
+==> Linting helm/legacy-web
+[INFO] Chart.yaml: icon is recommended
+
+1 chart(s) linted, 0 chart(s) failed
+[exit=0]
+
+$ helm template legacy-web helm/legacy-web
+---
+# Source: legacy-web/templates/pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: legacy-web-legacy-web
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: legacy-web
+      app.kubernetes.io/instance: legacy-web
+
+---
+# Source: legacy-web/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+
+---
+# Source: legacy-web/templates/secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+type: Opaque
+stringData:
+  DB_PASSWORD: change-me
+
+---
+# Source: legacy-web/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+data:
+  APP_ENV: production
+  APP_NAME: Legacy-Web-Service
+  CACHE_HOST: redis.default.svc.cluster.local
+  DB_HOST: mysql.default.svc.cluster.local
+  DB_PORT: "3306"
+
+---
+# Source: legacy-web/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+
+---
+# Source: legacy-web/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: legacy-web
+      app.kubernetes.io/instance: legacy-web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: legacy-web
+        app.kubernetes.io/instance: legacy-web
+      annotations:
+        checksum/config: 29bf84ef5182d7a86c2dc98b723fbac264c40e4e757d9d3a860e729aba10d63e
+    spec:
+      serviceAccountName: legacy-web-legacy-web
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: legacy-web
+              app.kubernetes.io/instance: legacy-web
+      terminationGracePeriodSeconds: 45
+      containers:
+        - name: app
+          image: "legacy-web:1.0.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: legacy-web-legacy-web
+            - secretRef:
+                name: legacy-web-legacy-web
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /readyz, port: http }
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sleep", "15"]
+          resources:
+            limits:
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: caddy-data, mountPath: /data }
+            - { name: caddy-data, mountPath: /config }
+      volumes:
+        - name: caddy-data
+          emptyDir: {}
+
+---
+# Source: legacy-web/templates/hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: legacy-web-legacy-web
+  minReplicas: 2
+  maxReplicas: 6
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target: { type: Utilization, averageUtilization: 70 }
+    - type: Resource
+      resource:
+        name: memory
+        target: { type: Utilization, averageUtilization: 80 }
+
+---
+# Source: legacy-web/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+    alb.ingress.kubernetes.io/target-type: ip
+spec:
+  ingressClassName: alb
+  rules:
+    - host: legacy-web.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: legacy-web-legacy-web
+                port: { number: 80 }
+[exit=0]
+
+$ helm template legacy-web helm/legacy-web -f helm/legacy-web/values-prod.yaml --show-only templates/ingress.yaml
+---
+# Source: legacy-web/templates/ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: legacy-web-legacy-web
+  labels:
+    app.kubernetes.io/name: legacy-web
+    app.kubernetes.io/instance: legacy-web
+    app.kubernetes.io/version: "1.0.0"
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:eu-west-1:123456789012:certificate/REPLACE
+    alb.ingress.kubernetes.io/group.name: shared-public
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:eu-west-1:123456789012:regional/webacl/REPLACE
+spec:
+  ingressClassName: alb
+  rules:
+    - host: legacy-web.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: legacy-web-legacy-web
+                port: { number: 80 }
+
+[exit=0]
+
+$ terraform -chdir=terraform fmt -check
+[exit=0]
+
+$ terraform -chdir=terraform init -backend=false -input=false
+[0m[1mInitializing provider plugins...[0m
+- Finding hashicorp/aws versions matching "~> 5.0"...
+- Finding hashicorp/kubernetes versions matching "~> 2.0"...
+- Installing hashicorp/aws v5.100.0...
+- Installing hashicorp/kubernetes v2.38.0...
+- Installed hashicorp/kubernetes v2.38.0 (signed by HashiCorp)
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mFailed to install provider[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mError while installing hashicorp/aws v5.100.0: releases.hashicorp.com: read
+[31m│[0m [0mtcp 10.200.4.12:59646->18.65.194.69:443: read: can't assign requested
+[31m│[0m [0maddress
+[31m╵[0m[0m
+[exit=1]
+
+$ terraform -chdir=terraform validate
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mMissing required provider[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mThis configuration requires provider registry.terraform.io/hashicorp/aws,
+[31m│[0m [0mbut that provider isn't available. You may be able to install it
+[31m│[0m [0mautomatically by running:
+[31m│[0m [0m  terraform init
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mMissing required provider[0m
+[31m│[0m [0m
+[31m│[0m [0m[0mThis configuration requires provider
+[31m│[0m [0mregistry.terraform.io/hashicorp/kubernetes, but that provider isn't
+[31m│[0m [0mavailable. You may be able to install it automatically by running:
+[31m│[0m [0m  terraform init
+[31m╵[0m[0m
+[exit=1]
+
+$ minikube start --driver=docker --wait=all
+* minikube v1.39.0 on Darwin 27.0.1 (arm64)
+* Using the docker driver based on user configuration
+* Using Docker Desktop driver with root privileges
+* Starting "minikube" primary control-plane node in "minikube" cluster
+* Pulling base image v0.0.51 ...
+* Preparing Kubernetes v1.37.0 on containerd 2.3.4 ...
+* Configuring CNI (Container Networking Interface) ...
+* Verifying Kubernetes components...
+  - Using image gcr.io/k8s-minikube/storage-provisioner:v5
+* Enabled addons: storage-provisioner, default-storageclass
+* Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
+[exit=0]
+
+$ minikube image load legacy-web:1.0.0
+[exit=0]
+
+$ minikube addons enable metrics-server
+* metrics-server is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+  - Using image registry.k8s.io/metrics-server/metrics-server:v0.9.0
+* The 'metrics-server' addon is enabled
+[exit=0]
+
+$ minikube addons enable ingress
+* ingress is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
+You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
+* After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
+  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
+  - Using image registry.k8s.io/ingress-nginx/controller:v1.15.1
+  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
+* Verifying ingress addon...
+* The 'ingress' addon is enabled
+[exit=0]
+
+$ kubectl -n ingress-nginx rollout status deploy/ingress-nginx-controller --timeout=180s
+Waiting for deployment "ingress-nginx-controller" rollout to finish: 0 of 1 updated replicas are available...
+deployment "ingress-nginx-controller" successfully rolled out
+[exit=0]
+
+$ helm upgrade --install legacy-web helm/legacy-web -f helm/legacy-web/values-nginx.yaml
+Release "legacy-web" does not exist. Installing it now.
+NAME: legacy-web
+LAST DEPLOYED: Fri Oct  9 16:11:18 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+TEST SUITE: None
+[exit=0]
+
+$ kubectl rollout status deploy/legacy-web-legacy-web --timeout=120s
+Waiting for deployment "legacy-web-legacy-web" rollout to finish: 0 of 2 updated replicas are available...
+Waiting for deployment "legacy-web-legacy-web" rollout to finish: 1 of 2 updated replicas are available...
+deployment "legacy-web-legacy-web" successfully rolled out
+[exit=0]
+
+$ kubectl get deploy,pods,svc,hpa,pdb,cm,secret,sa -o wide
+NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES             SELECTOR
+deployment.apps/legacy-web-legacy-web   2/2     2            2           6s    app          legacy-web:1.0.0   app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
+
+NAME                                        READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
+pod/legacy-web-legacy-web-9484c59b7-kvhf9   1/1     Running   0          6s    10.244.0.8   minikube   <none>           <none>
+pod/legacy-web-legacy-web-9484c59b7-rz4xw   1/1     Running   0          6s    10.244.0.7   minikube   <none>           <none>
+
+NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+service/kubernetes              ClusterIP   10.96.0.1        <none>        443/TCP   77s   <none>
+service/legacy-web-legacy-web   ClusterIP   10.105.237.159   <none>        80/TCP    6s    app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
+
+NAME                                                        REFERENCE                          TARGETS                                     MINPODS   MAXPODS   REPLICAS   AGE
+horizontalpodautoscaler.autoscaling/legacy-web-legacy-web   Deployment/legacy-web-legacy-web   cpu: <unknown>/70%, memory: <unknown>/80%   2         6         1          6s
+
+NAME                                               MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
+poddisruptionbudget.policy/legacy-web-legacy-web   1               N/A               1                     6s
+
+NAME                              DATA   AGE
+configmap/kube-root-ca.crt        1      70s
+configmap/legacy-web-legacy-web   5      6s
+
+NAME                                      TYPE                 DATA   AGE
+secret/legacy-web-legacy-web              Opaque               1      6s
+secret/sh.helm.release.v1.legacy-web.v1   helm.sh/release.v1   1      6s
+
+NAME                                   AGE
+serviceaccount/default                 70s
+serviceaccount/legacy-web-legacy-web   6s
+[exit=0]
+
+$ curl -si localhost:8081/healthz
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:11:27 GMT
+Content-Length: 43
+
+{"status":"healthy","timestamp":1791551487}[exit=0]
+
+$ curl -si localhost:8081/readyz
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:11:27 GMT
+Content-Length: 132
+
+{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791551487}[exit=0]
+
+$ curl -si localhost:8081/
+HTTP/1.1 200 OK
+Content-Type: application/json
+Server: FrankenPHP Caddy
+Date: Fri, 09 Oct 2026 13:11:27 GMT
+Content-Length: 276
+
+{
+    "service": "Legacy-Web-Service",
+    "environment": "production",
+    "message": "Service operational on Kubernetes",
+    "version": "1.0.0",
+    "hostname": "legacy-web-legacy-web-9484c59b7-kvhf9",
+    "client_ip": "127.0.0.1",
+    "time": "2026-10-09T13:11:27+00:00"
+}[exit=0]
+
+$ kubectl get ingress
+NAME                    CLASS   HOSTS              ADDRESS   PORTS   AGE
+legacy-web-legacy-web   nginx   legacy-web.local             80      14s
+[exit=0]
+
+$ curl -si -H Host: legacy-web.local localhost:8082/readyz
+HTTP/1.1 200 OK
+Date: Fri, 09 Oct 2026 13:11:35 GMT
+Content-Type: application/json
+Content-Length: 132
+Connection: keep-alive
+
+{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791551495}[exit=0]
+
+$ curl -si -H Host: other.local localhost:8082/readyz
+HTTP/1.1 404 Not Found
+Date: Fri, 09 Oct 2026 13:11:35 GMT
+Content-Type: text/html
+Content-Length: 146
+Connection: keep-alive
+
+<html>
+<head><title>404 Not Found</title></head>
+<body>
+<center><h1>404 Not Found</h1></center>
+<hr><center>nginx</center>
+</body>
+</html>
+[exit=0]
+
+$ kubectl delete pod -l app.kubernetes.io/name=legacy-web --wait=false
+pod "legacy-web-legacy-web-9484c59b7-kvhf9" deleted from default namespace
+pod "legacy-web-legacy-web-9484c59b7-rz4xw" deleted from default namespace
+[exit=0]
+
+$ kubectl get pods -o jsonpath={.items[0].spec.terminationGracePeriodSeconds}{" "}{.items[0].spec.containers[0].lifecycle}{"\n"}
+45 {"preStop":{"exec":{"command":["sleep","15"]}}}
+[exit=0]
+
+$ kubectl logs deploy/legacy-web-legacy-web --tail=10
+Found 4 pods, using pod/legacy-web-legacy-web-9484c59b7-kvhf9
+2026/10/09 13:11:19.134	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
+2026/10/09 13:11:19.134	[34mINFO[0m	tls	finished cleaning storage units
+{"level":"info","ts":1791551484.3301003,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"50072","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.003906486,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551487.487618,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58264","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/healthz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000364957,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551487.5004354,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58266","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/readyz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000265374,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551487.5119896,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58278","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000319416,"size":276,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551488.9851146,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60168","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/healthz","headers":{"Connection":["close"],"User-Agent":["kube-probe/1.37"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000658831,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551489.3249378,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60180","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"Connection":["close"],"User-Agent":["kube-probe/1.37"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.00091608,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551494.3273342,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60184","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.001461661,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791551495.63241,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.6","remote_port":"40430","client_ip":"10.244.0.6","proto":"HTTP/1.1","method":"GET","host":"legacy-web.local","uri":"/readyz","headers":{"X-Forwarded-Port":["80"],"Accept":["*/*"],"X-Real-Ip":["127.0.0.1"],"X-Forwarded-Host":["legacy-web.local"],"X-Forwarded-Proto":["http"],"X-Forwarded-Scheme":["http"],"X-Scheme":["http"],"User-Agent":["curl/8.7.1"],"X-Request-Id":["9732809fde112f8ec261c4fbbcab095f"],"X-Forwarded-For":["127.0.0.1"]}},"bytes_read":0,"user_id":"","duration":0.000687581,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+[exit=0]
+
+$ kubectl get pods -o jsonpath={range .items[*]}{.metadata.name}{" uid="}{.spec.securityContext.runAsUser}{"\n"}{end}
+legacy-web-legacy-web-9484c59b7-d49s7 uid=10001
+legacy-web-legacy-web-9484c59b7-kvhf9 uid=10001
+legacy-web-legacy-web-9484c59b7-p7tft uid=10001
+legacy-web-legacy-web-9484c59b7-rz4xw uid=10001
+[exit=0]
+
+$ helm uninstall legacy-web
+release "legacy-web" uninstalled
+[exit=0]
+
+$ minikube delete
+* Deleting "minikube" in docker ...
+* Deleting container "minikube" ...
+* Removing /Users/marten.mandla/.minikube/machines/minikube ...
+* Removed all traces of the "minikube" cluster.
+[exit=0]
+== Done ==
+
+== Rerun of Terraform steps (first attempt failed: network error downloading providers) ==
+
+$ terraform -chdir=terraform fmt -check
+[exit=0]
+
+$ terraform -chdir=terraform init -backend=false -input=false
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[exit=0]
+
+$ terraform -chdir=terraform validate
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+[exit=0]
