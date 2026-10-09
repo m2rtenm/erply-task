@@ -34,7 +34,11 @@ run helm lint helm/legacy-web
 run helm template legacy-web helm/legacy-web
 run helm template legacy-web helm/legacy-web -f helm/legacy-web/values-prod.yaml --show-only templates/ingress.yaml
 run terraform -chdir=terraform fmt -check
-run terraform -chdir=terraform init -backend=false -input=false
+# provider download can fail on flaky networks; retry
+for i in 1 2 3; do
+  run terraform -chdir=terraform init -backend=false -input=false && terraform -chdir=terraform validate -no-color >/dev/null 2>&1 && break
+  sleep 5
+done
 run terraform -chdir=terraform validate
 rm -rf terraform/.terraform terraform/.terraform.lock.hcl
 run minikube start --driver=docker --wait=all
@@ -42,6 +46,8 @@ run minikube image load legacy-web:1.0.0
 run minikube addons enable metrics-server
 run minikube addons enable ingress
 run kubectl -n ingress-nginx rollout status deploy/ingress-nginx-controller --timeout=180s
+run kubectl -n ingress-nginx wait --for=condition=complete job --all --timeout=120s
+sleep 10   # let the admission webhook start serving
 # the ingress-nginx admission webhook can lag behind the controller rollout; retry
 for i in 1 2 3 4 5 6; do
   run helm upgrade --install legacy-web helm/legacy-web -f helm/legacy-web/values-nginx.yaml

@@ -373,7 +373,7 @@ The full output is in `local-test.log`, produced by `scripts/local-test.sh` on a
 | Caddy metrics (opt-in variant) | `/metrics` returns Prometheus counters |
 | `helm lint`, `helm template` (default and `values-prod.yaml`) | Pass |
 | `terraform fmt -check`, `init -backend=false`, `validate` | Pass |
-| minikube install with `values-nginx.yaml` | Deployed (first attempt hit the webhook race, retry succeeded) |
+| minikube install with `values-nginx.yaml` | Deployed on the first attempt (the script waits for the ingress-nginx admission jobs and keeps a retry as a fallback) |
 | Rollout, probes, ConfigMap values via `/readyz` | Working |
 | Ingress `Host: legacy-web.local` / `Host: other.local` | 200 / 404 |
 | `preStop` and grace period on the pod | `45`, `sleep 15` present |

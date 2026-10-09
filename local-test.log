@@ -1,4 +1,4 @@
-== Run at 2026-10-09T13:08:06Z ==
+== Run at 2026-10-09T13:22:26Z ==
 
 $ docker build -t legacy-web:1.0.0 .
 #0 building with "orbstack" instance using docker driver
@@ -8,7 +8,7 @@ $ docker build -t legacy-web:1.0.0 .
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.io/dunglas/frankenphp:1-php8.3-alpine
-#2 DONE 0.3s
+#2 DONE 1.3s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 60B done
@@ -21,10 +21,10 @@ $ docker build -t legacy-web:1.0.0 .
 #5 transferring context: 158B done
 #5 DONE 0.0s
 
-#6 [3/6] COPY docker/zz-prod.ini /usr/local/etc/php/conf.d/zz-prod.ini
+#6 [2/6] COPY docker/Caddyfile /etc/caddy/Caddyfile
 #6 CACHED
 
-#7 [2/6] COPY docker/Caddyfile /etc/caddy/Caddyfile
+#7 [3/6] COPY docker/zz-prod.ini /usr/local/etc/php/conf.d/zz-prod.ini
 #7 CACHED
 
 #8 [4/6] COPY app/ /app/public/
@@ -44,32 +44,32 @@ $ docker build -t legacy-web:1.0.0 .
 [exit=0]
 
 $ docker run -d --name lw -p 8080:8080 legacy-web:1.0.0
-b13d5e2baf61453bc681c8ce8d8aa10b887baefc01b2ed8645c93b89b0551fe1
+879db816f11de7e45011d329372e8ae9afa16007e2eb67fa45f1af276cf3efc6
 [exit=0]
 
 $ curl -si localhost:8080/healthz
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:08:11 GMT
+Date: Fri, 09 Oct 2026 13:22:32 GMT
 Content-Length: 43
 
-{"status":"healthy","timestamp":1791551291}[exit=0]
+{"status":"healthy","timestamp":1791552152}[exit=0]
 
 $ curl -si localhost:8080/readyz
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:08:11 GMT
+Date: Fri, 09 Oct 2026 13:22:32 GMT
 Content-Length: 88
 
-{"status":"ready","db_host":"localhost","cache_host":"localhost","timestamp":1791551291}[exit=0]
+{"status":"ready","db_host":"localhost","cache_host":"localhost","timestamp":1791552152}[exit=0]
 
 $ curl -si localhost:8080/
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:08:11 GMT
+Date: Fri, 09 Oct 2026 13:22:32 GMT
 Content-Length: 255
 
 {
@@ -77,9 +77,9 @@ Content-Length: 255
     "environment": "production",
     "message": "Service operational on Kubernetes",
     "version": "1.0.0",
-    "hostname": "b13d5e2baf61",
+    "hostname": "879db816f11d",
     "client_ip": "192.168.215.1",
-    "time": "2026-10-09T13:08:11+00:00"
+    "time": "2026-10-09T13:22:32+00:00"
 }[exit=0]
 
 $ docker exec lw id
@@ -87,24 +87,24 @@ uid=10001(app) gid=10001(app) groups=10001(app)
 [exit=0]
 
 $ docker logs lw
-2026/10/09 13:08:07.423	[34mINFO[0m	maxprocs: Leaving GOMAXPROCS=12: CPU quota undefined
-2026/10/09 13:08:07.423	[34mINFO[0m	GOMEMLIMIT is updated	{"GOMEMLIMIT": 11339860377, "previous": 9223372036854775807}
-2026/10/09 13:08:07.423	[34mINFO[0m	using config from file	{"file": "/etc/caddy/Caddyfile"}
-2026/10/09 13:08:07.423	[34mINFO[0m	adapted config to JSON	{"adapter": "caddyfile"}
-2026/10/09 13:08:07.423	[33mWARN[0m	admin	admin endpoint disabled
-2026/10/09 13:08:07.423	[34mINFO[0m	http.auto_https	automatic HTTPS is completely disabled for server	{"server_name": "srv0"}
-2026/10/09 13:08:07.423	[34mINFO[0m	tls.cache.maintenance	started background certificate maintenance	{"cache": "0x940974e4b80"}
-2026/10/09 13:08:07.433	[34mINFO[0m	frankenphp	FrankenPHP started 🐘	{"php_version": "8.3.35", "total_threads": 24, "worker_threads": 0, "max_threads": 24, "max_requests": 0}
-2026/10/09 13:08:07.435	[33mWARN[0m	http	HTTP/2 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
-2026/10/09 13:08:07.435	[33mWARN[0m	http	HTTP/3 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
-2026/10/09 13:08:07.435	[34mINFO[0m	http.log	server running	{"name": "srv0", "protocols": ["h1", "h2", "h3"]}
-2026/10/09 13:08:07.435	[34mINFO[0m	autosaved config (load with --resume flag)	{"file": "/config/caddy/autosave.json"}
-2026/10/09 13:08:07.435	[34mINFO[0m	serving initial configuration
-2026/10/09 13:08:07.436	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
-2026/10/09 13:08:07.437	[34mINFO[0m	tls	finished cleaning storage units
-{"level":"info","ts":1791551291.4489372,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56242","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/healthz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.00138987,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551291.463642,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56250","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/readyz","headers":{"Accept":["*/*"],"User-Agent":["curl/8.7.1"]}},"bytes_read":0,"user_id":"","duration":0.000302249,"size":88,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551291.4764268,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"56256","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000289791,"size":255,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+2026/10/09 13:22:28.504	[34mINFO[0m	maxprocs: Leaving GOMAXPROCS=12: CPU quota undefined
+2026/10/09 13:22:28.504	[34mINFO[0m	GOMEMLIMIT is updated	{"GOMEMLIMIT": 11339860377, "previous": 9223372036854775807}
+2026/10/09 13:22:28.504	[34mINFO[0m	using config from file	{"file": "/etc/caddy/Caddyfile"}
+2026/10/09 13:22:28.504	[34mINFO[0m	adapted config to JSON	{"adapter": "caddyfile"}
+2026/10/09 13:22:28.504	[33mWARN[0m	admin	admin endpoint disabled
+2026/10/09 13:22:28.504	[34mINFO[0m	http.auto_https	automatic HTTPS is completely disabled for server	{"server_name": "srv0"}
+2026/10/09 13:22:28.504	[34mINFO[0m	tls.cache.maintenance	started background certificate maintenance	{"cache": "0x1c508d53d200"}
+2026/10/09 13:22:28.511	[33mWARN[0m	http	HTTP/2 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
+2026/10/09 13:22:28.511	[33mWARN[0m	http	HTTP/3 skipped because it requires TLS	{"network": "tcp", "addr": ":8080"}
+2026/10/09 13:22:28.511	[34mINFO[0m	http.log	server running	{"name": "srv0", "protocols": ["h1", "h2", "h3"]}
+2026/10/09 13:22:28.520	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
+2026/10/09 13:22:28.523	[34mINFO[0m	tls	finished cleaning storage units
+2026/10/09 13:22:28.546	[34mINFO[0m	frankenphp	FrankenPHP started 🐘	{"php_version": "8.3.35", "total_threads": 24, "worker_threads": 0, "max_threads": 24, "max_requests": 0}
+2026/10/09 13:22:28.546	[34mINFO[0m	autosaved config (load with --resume flag)	{"file": "/config/caddy/autosave.json"}
+2026/10/09 13:22:28.546	[34mINFO[0m	serving initial configuration
+{"level":"info","ts":1791552152.4294362,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"34086","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/healthz","headers":{"Accept":["*/*"],"User-Agent":["curl/8.7.1"]}},"bytes_read":0,"user_id":"","duration":0.001408745,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552152.4444118,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"34100","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/readyz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000315582,"size":88,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552152.4575372,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"192.168.215.1","remote_port":"34114","client_ip":"192.168.215.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8080","uri":"/","headers":{"Accept":["*/*"],"User-Agent":["curl/8.7.1"]}},"bytes_read":0,"user_id":"","duration":0.000266749,"size":255,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
 [exit=0]
 
 $ docker rm -f lw
@@ -113,14 +113,14 @@ lw
 
 == PHP error handling: warnings must reach stderr, not the HTTP response ==
 
-$ docker run -d --name lw-err -p 8090:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.68UCV9lbdP/err.php:/app/public/err.php:ro legacy-web:1.0.0
-5c9b0f13da57c44ee95cd4fc4528970ff08714c68c83360a8ffafa8fb6ff3949
+$ docker run -d --name lw-err -p 8090:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.iVBiPP0OR4/err.php:/app/public/err.php:ro legacy-web:1.0.0
+a40b727838845c00d7a3fa59aee7442fb7292b69ab7aa9983b2189a85b12b5cd
 [exit=0]
 $ curl -s localhost:8090/err.php   (expect body: ok)
 ok
 $ docker logs (stderr only), PHP warnings:
-2026/10/09 13:08:15.819	[33mWARN[0m	http.handlers.php	PHP Warning:  Undefined variable $undefined in /app/public/err.php on line 2	{"syslog_level": "warning"}
-2026/10/09 13:08:15.819	[33mWARN[0m	http.handlers.php	PHP Warning:  custom-test-error in /app/public/err.php on line 3	{"syslog_level": "warning"}
+2026/10/09 13:22:36.813	[33mWARN[0m	http.handlers.php	PHP Warning:  Undefined variable $undefined in /app/public/err.php on line 2	{"syslog_level": "warning"}
+2026/10/09 13:22:36.813	[33mWARN[0m	http.handlers.php	PHP Warning:  custom-test-error in /app/public/err.php on line 3	{"syslog_level": "warning"}
 $ X-Powered-By header (expect none):
 (none)
 
@@ -130,8 +130,8 @@ lw-err
 
 == Caddy metrics (opt-in; not enabled in the shipped Caddyfile) ==
 
-$ docker run -d --name lw-met -p 8091:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.68UCV9lbdP/Caddyfile:/etc/caddy/Caddyfile:ro legacy-web:1.0.0
-59a68178bf73dfad0e9835efb6e5fd9afc2d1e128da16b2819f65bd8e23865a7
+$ docker run -d --name lw-met -p 8091:8080 -v /var/folders/px/_xn2j9y90qgfgv40pk88dtcw0000gq/T/tmp.iVBiPP0OR4/Caddyfile:/etc/caddy/Caddyfile:ro legacy-web:1.0.0
+c2fed72c332d6f497384bbe69dee469b269bc6bd518ce1efb61e751c5824d041
 [exit=0]
 $ curl -s localhost:8091/metrics | grep caddy_http_requests_total
 caddy_http_requests_total{handler="php",server="srv0"} 2
@@ -408,38 +408,32 @@ $ terraform -chdir=terraform fmt -check
 
 $ terraform -chdir=terraform init -backend=false -input=false
 [0m[1mInitializing provider plugins...[0m
-- Finding hashicorp/aws versions matching "~> 5.0"...
 - Finding hashicorp/kubernetes versions matching "~> 2.0"...
-- Installing hashicorp/aws v5.100.0...
+- Finding hashicorp/aws versions matching "~> 5.0"...
 - Installing hashicorp/kubernetes v2.38.0...
 - Installed hashicorp/kubernetes v2.38.0 (signed by HashiCorp)
-[31m╷[0m[0m
-[31m│[0m [0m[1m[31mError: [0m[0m[1mFailed to install provider[0m
-[31m│[0m [0m
-[31m│[0m [0m[0mError while installing hashicorp/aws v5.100.0: releases.hashicorp.com: read
-[31m│[0m [0mtcp 10.200.4.12:59646->18.65.194.69:443: read: can't assign requested
-[31m│[0m [0maddress
-[31m╵[0m[0m
-[exit=1]
+- Installing hashicorp/aws v5.100.0...
+- Installed hashicorp/aws v5.100.0 (signed by HashiCorp)
+Terraform has created a lock file [1m.terraform.lock.hcl[0m to record the provider
+selections it made above. Include this file in your version control repository
+so that Terraform can guarantee to make the same selections by default when
+you run "terraform init" in the future.[0m
+
+[0m[1m[32mTerraform has been successfully initialized![0m[32m[0m
+[0m[32m
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.[0m
+[exit=0]
 
 $ terraform -chdir=terraform validate
-[31m╷[0m[0m
-[31m│[0m [0m[1m[31mError: [0m[0m[1mMissing required provider[0m
-[31m│[0m [0m
-[31m│[0m [0m[0mThis configuration requires provider registry.terraform.io/hashicorp/aws,
-[31m│[0m [0mbut that provider isn't available. You may be able to install it
-[31m│[0m [0mautomatically by running:
-[31m│[0m [0m  terraform init
-[31m╵[0m[0m
-[31m╷[0m[0m
-[31m│[0m [0m[1m[31mError: [0m[0m[1mMissing required provider[0m
-[31m│[0m [0m
-[31m│[0m [0m[0mThis configuration requires provider
-[31m│[0m [0mregistry.terraform.io/hashicorp/kubernetes, but that provider isn't
-[31m│[0m [0mavailable. You may be able to install it automatically by running:
-[31m│[0m [0m  terraform init
-[31m╵[0m[0m
-[exit=1]
+[32m[1mSuccess![0m The configuration is valid.
+[0m
+[exit=0]
 
 $ minikube start --driver=docker --wait=all
 * minikube v1.39.0 on Darwin 27.0.1 (arm64)
@@ -469,8 +463,8 @@ $ minikube addons enable ingress
 * ingress is an addon maintained by Kubernetes. For any concerns contact minikube on GitHub.
 You can view the list of minikube maintainers at: https://github.com/kubernetes/minikube/blob/master/OWNERS
 * After the addon is enabled, please run "minikube tunnel" and your ingress resources would be available at "127.0.0.1"
-  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
   - Using image registry.k8s.io/ingress-nginx/controller:v1.15.1
+  - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
   - Using image registry.k8s.io/ingress-nginx/kube-webhook-certgen:v1.6.9
 * Verifying ingress addon...
 * The 'ingress' addon is enabled
@@ -481,10 +475,15 @@ Waiting for deployment "ingress-nginx-controller" rollout to finish: 0 of 1 upda
 deployment "ingress-nginx-controller" successfully rolled out
 [exit=0]
 
+$ kubectl -n ingress-nginx wait --for=condition=complete job --all --timeout=120s
+job.batch/ingress-nginx-admission-create condition met
+job.batch/ingress-nginx-admission-patch condition met
+[exit=0]
+
 $ helm upgrade --install legacy-web helm/legacy-web -f helm/legacy-web/values-nginx.yaml
 Release "legacy-web" does not exist. Installing it now.
 NAME: legacy-web
-LAST DEPLOYED: Fri Oct  9 16:11:18 2026
+LAST DEPLOYED: Fri Oct  9 16:24:35 2026
 NAMESPACE: default
 STATUS: deployed
 REVISION: 1
@@ -500,58 +499,58 @@ deployment "legacy-web-legacy-web" successfully rolled out
 
 $ kubectl get deploy,pods,svc,hpa,pdb,cm,secret,sa -o wide
 NAME                                    READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES             SELECTOR
-deployment.apps/legacy-web-legacy-web   2/2     2            2           6s    app          legacy-web:1.0.0   app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
+deployment.apps/legacy-web-legacy-web   2/2     2            2           7s    app          legacy-web:1.0.0   app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
 
 NAME                                        READY   STATUS    RESTARTS   AGE   IP           NODE       NOMINATED NODE   READINESS GATES
-pod/legacy-web-legacy-web-9484c59b7-kvhf9   1/1     Running   0          6s    10.244.0.8   minikube   <none>           <none>
-pod/legacy-web-legacy-web-9484c59b7-rz4xw   1/1     Running   0          6s    10.244.0.7   minikube   <none>           <none>
+pod/legacy-web-legacy-web-9484c59b7-fxcl6   1/1     Running   0          7s    10.244.0.7   minikube   <none>           <none>
+pod/legacy-web-legacy-web-9484c59b7-m9j66   1/1     Running   0          7s    10.244.0.8   minikube   <none>           <none>
 
-NAME                            TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)   AGE   SELECTOR
-service/kubernetes              ClusterIP   10.96.0.1        <none>        443/TCP   77s   <none>
-service/legacy-web-legacy-web   ClusterIP   10.105.237.159   <none>        80/TCP    6s    app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
+NAME                            TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE   SELECTOR
+service/kubernetes              ClusterIP   10.96.0.1       <none>        443/TCP   84s   <none>
+service/legacy-web-legacy-web   ClusterIP   10.98.249.218   <none>        80/TCP    7s    app.kubernetes.io/instance=legacy-web,app.kubernetes.io/name=legacy-web
 
 NAME                                                        REFERENCE                          TARGETS                                     MINPODS   MAXPODS   REPLICAS   AGE
-horizontalpodautoscaler.autoscaling/legacy-web-legacy-web   Deployment/legacy-web-legacy-web   cpu: <unknown>/70%, memory: <unknown>/80%   2         6         1          6s
+horizontalpodautoscaler.autoscaling/legacy-web-legacy-web   Deployment/legacy-web-legacy-web   cpu: <unknown>/70%, memory: <unknown>/80%   2         6         1          7s
 
 NAME                                               MIN AVAILABLE   MAX UNAVAILABLE   ALLOWED DISRUPTIONS   AGE
-poddisruptionbudget.policy/legacy-web-legacy-web   1               N/A               1                     6s
+poddisruptionbudget.policy/legacy-web-legacy-web   1               N/A               1                     7s
 
 NAME                              DATA   AGE
-configmap/kube-root-ca.crt        1      70s
-configmap/legacy-web-legacy-web   5      6s
+configmap/kube-root-ca.crt        1      77s
+configmap/legacy-web-legacy-web   5      7s
 
 NAME                                      TYPE                 DATA   AGE
-secret/legacy-web-legacy-web              Opaque               1      6s
-secret/sh.helm.release.v1.legacy-web.v1   helm.sh/release.v1   1      6s
+secret/legacy-web-legacy-web              Opaque               1      7s
+secret/sh.helm.release.v1.legacy-web.v1   helm.sh/release.v1   1      7s
 
 NAME                                   AGE
-serviceaccount/default                 70s
-serviceaccount/legacy-web-legacy-web   6s
+serviceaccount/default                 77s
+serviceaccount/legacy-web-legacy-web   7s
 [exit=0]
 
 $ curl -si localhost:8081/healthz
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:11:27 GMT
+Date: Fri, 09 Oct 2026 13:24:45 GMT
 Content-Length: 43
 
-{"status":"healthy","timestamp":1791551487}[exit=0]
+{"status":"healthy","timestamp":1791552285}[exit=0]
 
 $ curl -si localhost:8081/readyz
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:11:27 GMT
+Date: Fri, 09 Oct 2026 13:24:45 GMT
 Content-Length: 132
 
-{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791551487}[exit=0]
+{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791552285}[exit=0]
 
 $ curl -si localhost:8081/
 HTTP/1.1 200 OK
 Content-Type: application/json
 Server: FrankenPHP Caddy
-Date: Fri, 09 Oct 2026 13:11:27 GMT
+Date: Fri, 09 Oct 2026 13:24:45 GMT
 Content-Length: 276
 
 {
@@ -559,28 +558,28 @@ Content-Length: 276
     "environment": "production",
     "message": "Service operational on Kubernetes",
     "version": "1.0.0",
-    "hostname": "legacy-web-legacy-web-9484c59b7-kvhf9",
+    "hostname": "legacy-web-legacy-web-9484c59b7-fxcl6",
     "client_ip": "127.0.0.1",
-    "time": "2026-10-09T13:11:27+00:00"
+    "time": "2026-10-09T13:24:45+00:00"
 }[exit=0]
 
 $ kubectl get ingress
 NAME                    CLASS   HOSTS              ADDRESS   PORTS   AGE
-legacy-web-legacy-web   nginx   legacy-web.local             80      14s
+legacy-web-legacy-web   nginx   legacy-web.local             80      15s
 [exit=0]
 
 $ curl -si -H Host: legacy-web.local localhost:8082/readyz
 HTTP/1.1 200 OK
-Date: Fri, 09 Oct 2026 13:11:35 GMT
+Date: Fri, 09 Oct 2026 13:24:53 GMT
 Content-Type: application/json
 Content-Length: 132
 Connection: keep-alive
 
-{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791551495}[exit=0]
+{"status":"ready","db_host":"mysql.default.svc.cluster.local","cache_host":"redis.default.svc.cluster.local","timestamp":1791552293}[exit=0]
 
 $ curl -si -H Host: other.local localhost:8082/readyz
 HTTP/1.1 404 Not Found
-Date: Fri, 09 Oct 2026 13:11:35 GMT
+Date: Fri, 09 Oct 2026 13:24:53 GMT
 Content-Type: text/html
 Content-Length: 146
 Connection: keep-alive
@@ -595,8 +594,8 @@ Connection: keep-alive
 [exit=0]
 
 $ kubectl delete pod -l app.kubernetes.io/name=legacy-web --wait=false
-pod "legacy-web-legacy-web-9484c59b7-kvhf9" deleted from default namespace
-pod "legacy-web-legacy-web-9484c59b7-rz4xw" deleted from default namespace
+pod "legacy-web-legacy-web-9484c59b7-fxcl6" deleted from default namespace
+pod "legacy-web-legacy-web-9484c59b7-m9j66" deleted from default namespace
 [exit=0]
 
 $ kubectl get pods -o jsonpath={.items[0].spec.terminationGracePeriodSeconds}{" "}{.items[0].spec.containers[0].lifecycle}{"\n"}
@@ -604,24 +603,24 @@ $ kubectl get pods -o jsonpath={.items[0].spec.terminationGracePeriodSeconds}{" 
 [exit=0]
 
 $ kubectl logs deploy/legacy-web-legacy-web --tail=10
-Found 4 pods, using pod/legacy-web-legacy-web-9484c59b7-kvhf9
-2026/10/09 13:11:19.134	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
-2026/10/09 13:11:19.134	[34mINFO[0m	tls	finished cleaning storage units
-{"level":"info","ts":1791551484.3301003,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"50072","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.003906486,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551487.487618,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58264","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/healthz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000364957,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551487.5004354,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58266","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/readyz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000265374,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551487.5119896,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"58278","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000319416,"size":276,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551488.9851146,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60168","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/healthz","headers":{"Connection":["close"],"User-Agent":["kube-probe/1.37"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000658831,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551489.3249378,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60180","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"Connection":["close"],"User-Agent":["kube-probe/1.37"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.00091608,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551494.3273342,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"60184","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.8:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.001461661,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
-{"level":"info","ts":1791551495.63241,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.6","remote_port":"40430","client_ip":"10.244.0.6","proto":"HTTP/1.1","method":"GET","host":"legacy-web.local","uri":"/readyz","headers":{"X-Forwarded-Port":["80"],"Accept":["*/*"],"X-Real-Ip":["127.0.0.1"],"X-Forwarded-Host":["legacy-web.local"],"X-Forwarded-Proto":["http"],"X-Forwarded-Scheme":["http"],"X-Scheme":["http"],"User-Agent":["curl/8.7.1"],"X-Request-Id":["9732809fde112f8ec261c4fbbcab095f"],"X-Forwarded-For":["127.0.0.1"]}},"bytes_read":0,"user_id":"","duration":0.000687581,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+Found 4 pods, using pod/legacy-web-legacy-web-9484c59b7-fxcl6
+2026/10/09 13:24:36.695	[34mINFO[0m	tls	cleaning storage unit	{"storage": "FileStorage:/data/caddy"}
+2026/10/09 13:24:36.696	[34mINFO[0m	tls	finished cleaning storage units
+{"level":"info","ts":1791552282.3440638,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"44806","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.7:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.002746657,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552285.5000534,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"51192","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/healthz","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.00050454,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552285.5162542,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"51196","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/readyz","headers":{"Accept":["*/*"],"User-Agent":["curl/8.7.1"]}},"bytes_read":0,"user_id":"","duration":0.000268374,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552285.530508,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"127.0.0.1","remote_port":"51204","client_ip":"127.0.0.1","proto":"HTTP/1.1","method":"GET","host":"localhost:8081","uri":"/","headers":{"User-Agent":["curl/8.7.1"],"Accept":["*/*"]}},"bytes_read":0,"user_id":"","duration":0.000238708,"size":276,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552286.4709537,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"44812","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.7:8080","uri":"/healthz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.00066929,"size":43,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552287.3397918,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"44818","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.7:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.000325791,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
+{"level":"info","ts":1791552292.3422856,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.1","remote_port":"53418","client_ip":"10.244.0.1","proto":"HTTP/1.1","method":"GET","host":"10.244.0.7:8080","uri":"/readyz","headers":{"User-Agent":["kube-probe/1.37"],"Accept":["*/*"],"Connection":["close"]}},"bytes_read":0,"user_id":"","duration":0.000527498,"size":132,"status":200,"resp_headers":{"Content-Type":["application/json"],"Server":["FrankenPHP Caddy"]}}
+{"level":"info","ts":1791552293.6250205,"logger":"http.log.access.log0","msg":"handled request","request":{"remote_ip":"10.244.0.6","remote_port":"46224","client_ip":"10.244.0.6","proto":"HTTP/1.1","method":"GET","host":"legacy-web.local","uri":"/readyz","headers":{"X-Request-Id":["d396205a18e368e4f64454b6afb8630f"],"X-Forwarded-Scheme":["http"],"X-Scheme":["http"],"Accept":["*/*"],"X-Real-Ip":["127.0.0.1"],"X-Forwarded-For":["127.0.0.1"],"User-Agent":["curl/8.7.1"],"X-Forwarded-Host":["legacy-web.local"],"X-Forwarded-Port":["80"],"X-Forwarded-Proto":["http"]}},"bytes_read":0,"user_id":"","duration":0.000358998,"size":132,"status":200,"resp_headers":{"Server":["FrankenPHP Caddy"],"Content-Type":["application/json"]}}
 [exit=0]
 
 $ kubectl get pods -o jsonpath={range .items[*]}{.metadata.name}{" uid="}{.spec.securityContext.runAsUser}{"\n"}{end}
-legacy-web-legacy-web-9484c59b7-d49s7 uid=10001
-legacy-web-legacy-web-9484c59b7-kvhf9 uid=10001
-legacy-web-legacy-web-9484c59b7-p7tft uid=10001
-legacy-web-legacy-web-9484c59b7-rz4xw uid=10001
+legacy-web-legacy-web-9484c59b7-6glwz uid=10001
+legacy-web-legacy-web-9484c59b7-d7k5k uid=10001
+legacy-web-legacy-web-9484c59b7-fxcl6 uid=10001
+legacy-web-legacy-web-9484c59b7-m9j66 uid=10001
 [exit=0]
 
 $ helm uninstall legacy-web
@@ -635,20 +634,3 @@ $ minikube delete
 * Removed all traces of the "minikube" cluster.
 [exit=0]
 == Done ==
-
-== Rerun of Terraform steps (first attempt failed: network error downloading providers) ==
-
-$ terraform -chdir=terraform fmt -check
-[exit=0]
-
-$ terraform -chdir=terraform init -backend=false -input=false
-
-If you ever set or change modules or backend configuration for Terraform,
-rerun this command to reinitialize your working directory. If you forget, other
-commands will detect it and remind you to do so if necessary.[0m
-[exit=0]
-
-$ terraform -chdir=terraform validate
-[32m[1mSuccess![0m The configuration is valid.
-[0m
-[exit=0]
