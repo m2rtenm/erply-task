@@ -1,0 +1,6 @@
+apiVersion: v2
+name: legacy-web
+description: Legacy PHP web service migrated to EKS
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

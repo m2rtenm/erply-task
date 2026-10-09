@@ -1,0 +1,10 @@
+# personal prep notes, not part of the submission
+INTERVIEW_NOTES.md
+
+# terraform local state/cache
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+
+.DS_Store

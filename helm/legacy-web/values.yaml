@@ -1,0 +1,72 @@
+replicaCount: 2
+
+image:
+  repository: legacy-web
+  tag: "1.0.0"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: ""
+  # IRSA: set to the role ARN output by terraform/main.tf
+  annotations: {}
+  # eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/legacy-web
+
+service:
+  port: 80
+  targetPort: 8080
+
+# Non-sensitive config -> ConfigMap
+config:
+  APP_NAME: Legacy-Web-Service
+  APP_ENV: production
+  DB_HOST: mysql.default.svc.cluster.local
+  DB_PORT: "3306"
+  CACHE_HOST: redis.default.svc.cluster.local
+
+# Sensitive config -> Secret. Placeholders only; in prod use External Secrets
+# Operator (set existingSecret) and never commit real values.
+secret:
+  existingSecret: ""
+  data:
+    DB_PASSWORD: change-me
+
+resources:
+  requests: { cpu: 100m, memory: 128Mi }
+  limits: { memory: 256Mi }
+
+strategy:
+  maxSurge: 1
+  maxUnavailable: 0
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Graceful shutdown: sleep lets the ALB deregister the pod before SIGTERM.
+terminationGracePeriodSeconds: 45
+preStopSleepSeconds: 15
+
+pdb:
+  minAvailable: 1
+
+ingress:
+  enabled: true
+  className: alb
+  host: legacy-web.example.com
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP":80},{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-redirect: "443"
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+    alb.ingress.kubernetes.io/target-group-attributes: deregistration_delay.timeout_seconds=30
+    # Share one ALB across services (set per environment):
+    # alb.ingress.kubernetes.io/group.name: shared-public
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:...
+    # alb.ingress.kubernetes.io/wafv2-acl-arn: arn:aws:wafv2:...
+    # external-dns.alpha.kubernetes.io/hostname is derived from the host rule

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "legacy-web.name" . }}
+  labels: {{- include "legacy-web.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  selector: {{- include "legacy-web.selector" . | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http

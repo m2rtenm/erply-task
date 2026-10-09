@@ -1,0 +1,6 @@
+# Local ingress testing with minikube's ingress-nginx addon.
+ingress:
+  enabled: true
+  className: nginx
+  host: legacy-web.local
+  annotations: {}

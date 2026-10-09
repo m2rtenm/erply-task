@@ -1,0 +1,17 @@
+{
+	admin off
+	auto_https off
+	frankenphp
+	log {
+		output stderr
+		format console
+	}
+}
+
+:8080 {
+	root * /app/public
+	log {
+		output stdout
+	}
+	php_server
+}
